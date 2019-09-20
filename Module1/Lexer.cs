@@ -58,6 +58,7 @@ namespace Lexer
 
         protected System.Text.StringBuilder intString;
         public int parseResult = 0;
+		Boolean minus = false;
 
         public IntLexer(string input)
             : base(input)
@@ -70,12 +71,18 @@ namespace Lexer
             NextCh();
             if (currentCh == '+' || currentCh == '-')
             {
+				if (currentCh == '-')
+				{
+					minus = true;
+				}
+
                 NextCh();
             }
         
             if (char.IsDigit(currentCh))
             {
-                NextCh();
+				parseResult = parseResult * 10 + int.Parse(currentCh.ToString());
+				NextCh();
             }
             else
             {
@@ -84,7 +91,8 @@ namespace Lexer
 
             while (char.IsDigit(currentCh))
             {
-                NextCh();
+				parseResult = parseResult * 10 + int.Parse(currentCh.ToString());
+				NextCh();
             }
 
 
@@ -92,6 +100,11 @@ namespace Lexer
             {
                 Error();
             }
+
+			if (minus == true)
+			{
+				parseResult *= -1;
+			}
 
             return true;
 
@@ -226,7 +239,11 @@ namespace Lexer
         private StringBuilder builder;
         private double parseResult;
 
-        public double ParseResult
+		double res = 0;
+		bool minus = false;
+		int digits = 0;
+
+		public double ParseResult
         {
             get { return parseResult; }
 
@@ -240,8 +257,66 @@ namespace Lexer
 
         public override bool Parse()
         {
-            throw new NotImplementedException();
-        }
+			NextCh();
+
+			if (currentCharValue == -1)
+				Error();
+
+			if (!(char.IsDigit(currentCh) || currentCh == '+' || currentCh == '-'))
+				Error();
+
+			if (currentCh == '+' || currentCh == '-')
+			{
+				minus = currentCh == '-';
+				NextCh();
+			}
+
+			while (char.IsDigit(currentCh))
+			{
+				res = res * 10 + (int)currentCh - (int)'0';
+				NextCh();
+			}
+
+			if (currentCharValue == -1)
+			{
+				if (minus)
+					res *= -1;
+				parseResult = res;
+				return true;
+			}
+
+			else if (currentCh != '.')
+			{
+				Error();
+			}
+
+			NextCh();
+			digits++;
+
+			if (currentCharValue == -1)
+				Error();
+
+			while (char.IsDigit(currentCh))
+			{
+				res += ((int)currentCh - (int)'0') / Math.Pow(10, digits);
+				NextCh();
+			}
+
+			if (currentCharValue != -1)
+			{
+				Error();
+			}
+
+			if (minus)
+				res *= -1;
+
+			parseResult = res;
+
+
+			return true;
+
+		
+	}
        
     }
 
