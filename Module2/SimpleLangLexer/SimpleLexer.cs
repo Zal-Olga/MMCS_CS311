@@ -104,6 +104,9 @@ namespace SimpleLexer
 			keywordsMap["and"] = Tok.AND;
 			keywordsMap["or"] = Tok.OR;
 			keywordsMap["not"] = Tok.NOT;
+			keywordsMap["for"] = Tok.FOR;
+			keywordsMap["to"] = Tok.TO;
+			keywordsMap["do"] = Tok.DO;
 
 		}
 
