@@ -1,11 +1,11 @@
 
 // ==========================================================================
-//  GPPG error listing for yacc source file <SimpleYacc.y>
+//  GPPG error listing for yacc source file <SimpleYacc.y - 20.12.2019 19:20:09>
 // ==========================================================================
-//  Version:  1.3.6
-//  Machine:  SSM
-//  DateTime: 17.08.2014 10:25:15
-//  UserName: Станислав
+//  Version:  1.5.0
+//  Machine:  MIL8A-202A-01
+//  DateTime: 20.12.2019 19:20:13
+//  UserName: user
 // ==========================================================================
 
 
@@ -16,19 +16,16 @@
 
 %output = SimpleYacc.cs
 
-%using System.IO;
-
 %namespace SimpleParser
 
-%token BEGIN END CYCLE INUM RNUM ID ASSIGN SEMICOLON  
-
+%token BEGIN END CYCLE INUM RNUM ID ASSIGN SEMICOLON REPEAT UNTIL WHILE DO IF THEN ELSE FOR TO OPENP CLOSEP WRITE VAR COMMA MINUS PLUS MULT DELIM
 %%
-// Error: NonTerminal symbol "st" has no productions
-// Warning: Terminating st fixes the following size-2 NonTerminal set
-   // {cycle, st}
-// Error: There are 2 non-terminating NonTerminal Symbols
-   //  {cycle, st}
-// ------------------------------------------------------------------
+// Warning: Terminating repeat fixes the following size-1 NonTerminal set
+   // {repeat}
+// Error: NonTerminal symbol "repeat" has no productions
+// Error: There are 1 non-terminating NonTerminal Symbols
+   //  {repeat}
+// ----------------------------------------------------------------------
 
 progr   : block
 		;
@@ -39,8 +36,17 @@ stlist	: statement
 
 statement: assign
 		| block  
-		| cycle  
+		| cycle 
+		| repeat
+		| while
+		| if
+		| write
+		| var
 		;
+identlist : ID 
+		| ID COMMA identlist
+		;
+
 
 ident 	: ID 
 		;
@@ -48,17 +54,49 @@ ident 	: ID
 assign 	: ident ASSIGN expr 
 		;
 
-expr	: ident  
-		| INUM 
+expr	: e1
 		;
+
+e1		: e2
+		| e1 MINUS e2
+		| e1 PLUS e2
+		;
+
+e2		: e3
+		| e2 MULT e3
+		| e2 DELIM e3
+		;
+
+e3		: ident | INUM | RNUM | OPENP expr CLOSEP
+		;
+
 
 block	: BEGIN stlist END 
 		;
 
-cycle	: CYCLE expr st 
+cycle	: CYCLE expr statement 
 		;
-	
-%%
+	repeat  : REPEAT stlist UNTIL expr
+//^^^^^
+// Error: Syntax error, unexpected ident, expecting %%, or anchoredSymbol, or EOF
+// ------------------------------------------------------------------------------
+		;
 
+while   : WHILE expr DO statement
+		;
+
+if		: IF expr THEN statement
+		| IF expr THEN statement ELSE statement
+		;
+
+while   : FOR assign TO expr DO statement
+		;
+
+write   : WRITE OPENP expr CLOSEP
+		;
+
+var		: VAR identlist
+		;
+%%
 // ==========================================================================
 
